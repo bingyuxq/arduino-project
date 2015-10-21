@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
 
-namespace SerialportSample
+namespace arduino_support
 {
     public partial class SerialportSampleForm : Form
     {

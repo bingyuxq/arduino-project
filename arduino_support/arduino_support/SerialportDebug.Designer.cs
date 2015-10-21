@@ -1,4 +1,4 @@
-﻿namespace SerialportSample
+﻿namespace arduino_support
 {
     partial class SerialportSampleForm
     {

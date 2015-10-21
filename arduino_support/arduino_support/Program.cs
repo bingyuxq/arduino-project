@@ -16,7 +16,7 @@ namespace arduino_support
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SerialportSample.SerialportSampleForm());
+            Application.Run(new Main());
         }
     }
 }

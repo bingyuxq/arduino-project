@@ -153,3 +153,46 @@ void loop() {
   // The client will actually be disconnected
   // when the function returns and 'client' object is detroyed
 }
+
+//char[]来源，const char分隔符，char*目标缓存数组的指针(buff为char* []类型，int元素数缓存
+void split(char *src, const char *separator, char **dest, int *num)
+{
+    char *pSeparator, *pStart, *pEnd;
+    unsigned int sep_len;
+    int count = 0;
+    
+    if (src == NULL || strlen(src) == 0) return;
+    
+    pSeparator = (char *)malloc(16);
+    if (pSeparator == NULL) return;
+    
+    if (separator == NULL || strlen(separator) == 0) strcpy(pSeparator," ");/* one blank by default */
+    else strcpy(pSeparator,separator);
+
+    sep_len = strlen(pSeparator);
+        
+    pStart = src;
+    
+    while(1)
+    {
+        pEnd = strstr(pStart, pSeparator);
+        if (pEnd != NULL)
+        {
+            memset(pEnd,'\0',sep_len);
+            *dest++ = pStart;
+            pEnd = pEnd + sep_len;
+            pStart = pEnd;
+            ++count;
+        }
+        else
+        {
+            *dest = pStart;
+            ++count;
+            break;
+        }
+    }
+
+    *num = count;
+
+    if (pSeparator != NULL) free(pSeparator);
+}
