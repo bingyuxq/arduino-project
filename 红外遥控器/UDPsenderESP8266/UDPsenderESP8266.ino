@@ -72,22 +72,17 @@ void RemoteSender(char* string)
   char *dest[500];
   int num = 0;
   split(string, ",", dest, &num);
-  Serial.println("alive1");
   unsigned int RawData[num];
-  for (int i = 1; i <= num; i++) {
-  Serial.println(i);
+  for (int i = 1; i < num; i++) {
     //unsigned int RawData[68] = {8900,4450,500,600,550,550,550,600,500,1700,500,600,550,600,500,550,550,550,550,600,500,1750,500,1700,500,550,550,600,500,1700,550,1650,550,1700,500,1750,500,1700,500,1750,450,650,500,550,550,600,500,1700,500,600,500,600,550,550,550,550,550,1700,500,1750,500,1700,500,600,500,1700,550};
     RawData[i - 1] = atoi(dest[i]);
   }
-  Serial.println("alive2");
   irsend.sendRaw(RawData, num-1, 38);//38kHz
   delay(100);
   
-  Serial.println("alive3");
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
   Udp.write("Command Sent");
   Udp.endPacket();
-  Serial.println("alive4");
 }
 
 void LearnCommand(char* string)
@@ -96,7 +91,7 @@ void LearnCommand(char* string)
   //char *dest[128];
   // send a reply, to the IP address and port that sent us the packet we received
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("Beat Me");
+  Udp.write("Try Me");
   Udp.endPacket();
   delay(500);
   int BeginMsec = millis() + 30000;
