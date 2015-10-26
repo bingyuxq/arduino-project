@@ -1,3 +1,4 @@
+#define DEBUG
 /*
  * IRremoteESP8266: IRsendDemo - demonstrates sending IR codes with IRsend
  * An IR LED must be connected to ESP8266 pin 0.
@@ -52,8 +53,14 @@ void RemoteSender(char* string)
   unsigned int RawData[RawLength];
   for (int i = 1; i < num; i++) {
     RawData[i-1] = atoi(dest[i]);
+    #ifdef DEBUG
+    Serial.print(i); Serial.print(":");Serial.println(RawData[i - 1] );
+    #endif
   }
 
+    #ifdef DEBUG
+    Serial.println(RawLength);
+    #endif
   irsend.sendRaw(RawData, RawLength, 38);
   delay(100);
   Serial.println("done");

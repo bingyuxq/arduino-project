@@ -1,15 +1,11 @@
-
-#define READTIMEOUT 30000
-#include "IRremoteESP8266.h"
-
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
+const char* host = "esp8266-ota";
 const char* ssid = "bingyu-AP";
 const char* pass = "bingyuxq";
-IRsend irsend(13); //an IR led is connected to GPIO pin 13
 
-IRrecv irrecv(5); //an IR receiver is connected to GPIO pin 5
+
 unsigned int localPort = 8888;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 char  ReplyBuffer[] = "acknowledged";       // a string to send back
@@ -19,9 +15,12 @@ WiFiUDP Udp;
 
 void setup() {
   Serial.begin(115200);
+#ifdef DEBUG
+  Serial.println(UDP_TX_PACKET_MAX_SIZE);
+#endif
   // start the Wifi and UDP:
   WiFi.begin(ssid, pass);
-  irsend.begin();
+  
   Serial.print("\nConnecting to "); Serial.println(ssid);
   uint8_t i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
@@ -61,84 +60,40 @@ void loop() {
     Serial.println("Contents:");
     Serial.println(packetBuffer);
 
-    if (strchr(packetBuffer, 'R')) {
-      RemoteSender(packetBuffer);
+    if (strstr(packetBuffer, "ON")) {
+    Serial.println("on command:");
+      SwitchON(packetBuffer);
     }
-    if (strchr(packetBuffer, 'L')) {
-      LearnCommand(packetBuffer);
+    if (strstr(packetBuffer, "OFF")) {
+    Serial.println("off command:");
+      SwitchOFF(packetBuffer);
     }
   }
   delay(10);
 }
 
-void RemoteSender(char* string)
+void SwitchON(char* string)
 {
-  char *dest[500];
-  int num = 0;
-  split(string, ",", dest, &num);
-  unsigned int RawData[num+1];
-  for (int i = 1; i < num; i++) {
-    //unsigned int RawData[68] = {8900,4450,500,600,550,550,550,600,500,1700,500,600,550,600,500,550,550,550,550,600,500,1750,500,1700,500,550,550,600,500,1700,550,1650,550,1700,500,1750,500,1700,500,1750,450,650,500,550,550,600,500,1700,500,600,500,600,550,550,550,550,550,1700,500,1750,500,1700,500,600,500,1700,550};
-    RawData[i - 1] = atoi(dest[i]);
-  }
-  irsend.sendRaw(RawData, num - 1, 38); //38kHz
+  char pin[2]="";
+  pin[0]=string[3];pin[1]=string[4];
+Serial.println(atoi(pin));
   delay(100);
 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("Command Sent");
+  Udp.write("ON");
   Udp.endPacket();
 }
 
-void LearnCommand(char* string)
+void SwitchOFF(char* string)
 {
-  irrecv.enableIRIn();  // Start the receiver
-  //char *dest[128];
-  // send a reply, to the IP address and port that sent us the packet we received
-  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("Try Me");
-  Udp.endPacket();
-  delay(500);
-  int BeginMsec = millis() + READTIMEOUT;
-  int UDPWriteSize = 0;
-  do
-  {
-    decode_results  results;        // Somewhere to store the results
+  char pin[2]="";
+  pin[0]=string[4];pin[1]=string[5];
+Serial.println(atoi(pin));
+  delay(100);
 
-    if (irrecv.decode(&results)) {  // Grab an IR code
-      int Length = results.rawlen - 1;
-      unsigned int RawData[Length];
-
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      for (int i = 0;  i < results.rawlen;  i++) {
-        unsigned int Data = results.rawbuf[i] * USECPERTICK;
-        /*if (!(i & 1)) {Serial.print("-");Serial.print(results->rawbuf[i] * USECPERTICK, DEC);} //odd
-        else{Serial.print("+");Serial.print(results->rawbuf[i] * USECPERTICK, DEC);} //even*/
-        char buff[6];
-        itostr(buff, Data);
-        UDPWriteSize += Udp.write(buff) + 1 ;
-        if ( i < Length ) Udp.write(",");
-        if (UDPWriteSize > 508) {
-          UDPWriteSize = 0;
-          Udp.endPacket();
-          delay(100);
-          Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        }
-      }
-      Udp.endPacket();
-      delay(500);
-      //dumpRaw(&results);            // Output the results in RAW format
-      irrecv.disableIRIn();
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.write("Got it");
-      Udp.endPacket();
-      return;
-    }
-    delay(10);
-  } while (BeginMsec > millis());
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("Got nothing");
+  Udp.write("OFF");
   Udp.endPacket();
-  irrecv.disableIRIn();
 }
 
 char* itostr(char *str, int i)

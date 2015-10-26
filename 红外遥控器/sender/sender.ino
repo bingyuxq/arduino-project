@@ -1,6 +1,6 @@
 #include <IRremote.h>
 //发射接口默认是D3,好像是能改define
-#define TIMER_PWM_PIN 1
+//#define TIMER_PWM_PIN 1
 IRsend irsend;
 
 String Command = "";

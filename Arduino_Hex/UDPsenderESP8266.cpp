@@ -1,3 +1,4 @@
+#line 1 "UDPsenderESP8266.ino"
 
 #define READTIMEOUT 30000
 #include "IRremoteESP8266.h"
@@ -5,21 +6,29 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
+#include "Arduino.h"
+void setup();
+void loop();
+void RemoteSender(char* string);
+void LearnCommand(char* string);
+char* itostr(char *str, int i);
+void split(char *src, const char *separator, char **dest, int *num);
+#line 8
 const char* ssid = "bingyu-AP";
 const char* pass = "bingyuxq";
-IRsend irsend(13); //an IR led is connected to GPIO pin 13
+IRsend irsend(13);                                        
 
-IRrecv irrecv(5); //an IR receiver is connected to GPIO pin 5
-unsigned int localPort = 8888;      // local port to listen on
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
-char  ReplyBuffer[] = "acknowledged";       // a string to send back
+IRrecv irrecv(5);                                            
+unsigned int localPort = 8888;                                
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE];                                  
+char  ReplyBuffer[] = "acknowledged";                               
 
-// An WifiUDP instance to let us send and receive packets over UDP
+                                                                  
 WiFiUDP Udp;
 
 void setup() {
   Serial.begin(115200);
-  // start the Wifi and UDP:
+                            
   WiFi.begin(ssid, pass);
   irsend.begin();
   Serial.print("\nConnecting to "); Serial.println(ssid);
@@ -36,7 +45,7 @@ void setup() {
 }
 
 void loop() {
-  // if there's data available, read a packet
+                                             
   int packetSize = Udp.parsePacket();
   if (packetSize)
   {
@@ -55,7 +64,7 @@ void loop() {
     Serial.print(", port ");
     Serial.println(Udp.remotePort());
 
-    // read the packet into packetBufffer
+                                         
     memset(packetBuffer, 0 , sizeof(packetBuffer));
     Udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
     Serial.println("Contents:");
@@ -78,10 +87,10 @@ void RemoteSender(char* string)
   split(string, ",", dest, &num);
   unsigned int RawData[num+1];
   for (int i = 1; i < num; i++) {
-    //unsigned int RawData[68] = {8900,4450,500,600,550,550,550,600,500,1700,500,600,550,600,500,550,550,550,550,600,500,1750,500,1700,500,550,550,600,500,1700,550,1650,550,1700,500,1750,500,1700,500,1750,450,650,500,550,550,600,500,1700,500,600,500,600,550,550,550,550,550,1700,500,1750,500,1700,500,600,500,1700,550};
+                                                                                                                                                                                                                                                                                                                               
     RawData[i - 1] = atoi(dest[i]);
   }
-  irsend.sendRaw(RawData, num - 1, 38); //38kHz
+  irsend.sendRaw(RawData, num - 1, 38);        
   delay(100);
 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
@@ -91,9 +100,9 @@ void RemoteSender(char* string)
 
 void LearnCommand(char* string)
 {
-  irrecv.enableIRIn();  // Start the receiver
-  //char *dest[128];
-  // send a reply, to the IP address and port that sent us the packet we received
+  irrecv.enableIRIn();                       
+                    
+                                                                                 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
   Udp.write("Try Me");
   Udp.endPacket();
@@ -102,17 +111,17 @@ void LearnCommand(char* string)
   int UDPWriteSize = 0;
   do
   {
-    decode_results  results;        // Somewhere to store the results
+    decode_results  results;                                         
 
-    if (irrecv.decode(&results)) {  // Grab an IR code
+    if (irrecv.decode(&results)) {                    
       int Length = results.rawlen - 1;
       unsigned int RawData[Length];
 
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       for (int i = 0;  i < results.rawlen;  i++) {
         unsigned int Data = results.rawbuf[i] * USECPERTICK;
-        /*if (!(i & 1)) {Serial.print("-");Serial.print(results->rawbuf[i] * USECPERTICK, DEC);} //odd
-        else{Serial.print("+");Serial.print(results->rawbuf[i] * USECPERTICK, DEC);} //even*/
+                                                                                                      
+                                                                                             
         char buff[6];
         itostr(buff, Data);
         UDPWriteSize += Udp.write(buff) + 1 ;
@@ -126,7 +135,7 @@ void LearnCommand(char* string)
       }
       Udp.endPacket();
       delay(500);
-      //dumpRaw(&results);            // Output the results in RAW format
+                                                                         
       irrecv.disableIRIn();
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       Udp.write("Got it");
@@ -146,7 +155,7 @@ char* itostr(char *str, int i)
   sprintf(str, "%d", i);
   return str;
 }
-//char[]来源，const char分隔符，char*目标缓存数组的指针(buff为char* []类型，int元素数缓存
+                                                                
 void split(char *src, const char *separator, char **dest, int *num)
 {
   char *pSeparator, *pStart, *pEnd;
@@ -158,7 +167,7 @@ void split(char *src, const char *separator, char **dest, int *num)
   pSeparator = (char *)malloc(16);
   if (pSeparator == NULL) return;
 
-  if (separator == NULL || strlen(separator) == 0) strcpy(pSeparator, " "); /* one blank by default */
+  if (separator == NULL || strlen(separator) == 0) strcpy(pSeparator, " ");                           
   else strcpy(pSeparator, separator);
 
   sep_len = strlen(pSeparator);
@@ -188,3 +197,4 @@ void split(char *src, const char *separator, char **dest, int *num)
 
   if (pSeparator != NULL) free(pSeparator);
 }
+
