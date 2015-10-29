@@ -30,6 +30,7 @@
         {
             this.SerialportDebug = new System.Windows.Forms.Button();
             this.tcpClient = new System.Windows.Forms.Button();
+            this.RealtimeCurve = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialportDebug
@@ -52,11 +53,22 @@
             this.tcpClient.UseVisualStyleBackColor = true;
             this.tcpClient.Click += new System.EventHandler(this.tcpClient_Click);
             // 
+            // RealtimeCurve
+            // 
+            this.RealtimeCurve.Location = new System.Drawing.Point(265, 13);
+            this.RealtimeCurve.Name = "RealtimeCurve";
+            this.RealtimeCurve.Size = new System.Drawing.Size(120, 23);
+            this.RealtimeCurve.TabIndex = 1;
+            this.RealtimeCurve.Text = "RealtimeCurve";
+            this.RealtimeCurve.UseVisualStyleBackColor = true;
+            this.RealtimeCurve.Click += new System.EventHandler(this.RealtimeCurve_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(612, 372);
+            this.Controls.Add(this.RealtimeCurve);
             this.Controls.Add(this.tcpClient);
             this.Controls.Add(this.SerialportDebug);
             this.Name = "Main";
@@ -69,6 +81,7 @@
 
         private System.Windows.Forms.Button SerialportDebug;
         private System.Windows.Forms.Button tcpClient;
+        private System.Windows.Forms.Button RealtimeCurve;
     }
 }
 

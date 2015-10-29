@@ -72,6 +72,10 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="RealtimeCurve.cs" />
+    <Compile Include="RealtimeCurve.Designer.cs">
+      <DependentUpon>RealtimeCurve.cs</DependentUpon>
+    </Compile>
     <Compile Include="SerialportDebug.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,6 +92,9 @@
     </Compile>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RealtimeCurve.resx">
+      <DependentUpon>RealtimeCurve.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SerialportDebug.resx">
       <DependentUpon>SerialportDebug.cs</DependentUpon>

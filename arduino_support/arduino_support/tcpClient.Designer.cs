@@ -186,6 +186,7 @@
             this.MinimumSize = new System.Drawing.Size(510, 470);
             this.Name = "tcpClient";
             this.Text = "tcpClient";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

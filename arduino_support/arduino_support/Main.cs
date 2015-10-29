@@ -20,13 +20,20 @@ namespace arduino_support
         private void SerialportDebug_Click(object sender, EventArgs e)
         {
             arduino_support.SerialportSampleForm SerialportDebug = new arduino_support.SerialportSampleForm();
-            SerialportDebug.ShowDialog();
+            SerialportDebug.Show();
         }
 
         private void tcpClient_Click(object sender, EventArgs e)
         {
             tcpClient tcpClient = new tcpClient();
-            tcpClient.ShowDialog();
+            tcpClient.Show();
+        }
+
+        private void RealtimeCurve_Click(object sender, EventArgs e)
+        {
+            RealtimeCurve RealtimeCurve = new RealtimeCurve();
+            RealtimeCurve.Show();
+
         }
     }
 }

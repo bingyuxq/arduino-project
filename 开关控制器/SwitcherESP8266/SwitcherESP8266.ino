@@ -1,26 +1,23 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-const char* host = "esp8266-ota";
 const char* ssid = "bingyu-AP";
 const char* pass = "bingyuxq";
 
 
 unsigned int localPort = 8888;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
-char  ReplyBuffer[] = "acknowledged";       // a string to send back
+#define maxPINnum 6
 
 // An WifiUDP instance to let us send and receive packets over UDP
 WiFiUDP Udp;
+uint8_t AvalablePIN[maxPINnum] = {2, 4, 5, 13, 14, 16};
 
 void setup() {
   Serial.begin(115200);
-#ifdef DEBUG
-  Serial.println(UDP_TX_PACKET_MAX_SIZE);
-#endif
   // start the Wifi and UDP:
   WiFi.begin(ssid, pass);
-  
+
   Serial.print("\nConnecting to "); Serial.println(ssid);
   uint8_t i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
@@ -32,6 +29,10 @@ void setup() {
   Serial.print("Ready!");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  for (int i = 0;  i < maxPINnum; i++) {
+    pinMode(AvalablePIN[i], OUTPUT);
+    digitalWrite(AvalablePIN[i], LOW);
+  }
 }
 
 void loop() {
@@ -61,12 +62,20 @@ void loop() {
     Serial.println(packetBuffer);
 
     if (strstr(packetBuffer, "ON")) {
-    Serial.println("on command:");
+      Serial.println("on command:");
       SwitchON(packetBuffer);
     }
     if (strstr(packetBuffer, "OFF")) {
-    Serial.println("off command:");
+      Serial.println("off command:");
       SwitchOFF(packetBuffer);
+    }
+    if (strstr(packetBuffer, "ALLON")) {
+      Serial.println("all on command:");
+      AllON();
+    }
+    if (strstr(packetBuffer, "ALLOFF")) {
+      Serial.println("all off command:");
+      AllOFF();
     }
   }
   delay(10);
@@ -74,25 +83,68 @@ void loop() {
 
 void SwitchON(char* string)
 {
-  char pin[2]="";
-  pin[0]=string[3];pin[1]=string[4];
-Serial.println(atoi(pin));
+  char pin[2] = "";
+  pin[0] = string[3]; pin[1] = string[4];
+  int targetPIN = atoi(pin);
+  for (int i = 0; i < maxPINnum; i++) {
+    if (targetPIN == AvalablePIN[i]) {
+      digitalWrite(targetPIN, HIGH);
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.write(targetPIN); Udp.write(" ON");
+      Udp.endPacket();
+    }
+  }
   delay(100);
 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("ON");
+  Udp.write(targetPIN); Udp.write("is not a usable PIN");
   Udp.endPacket();
 }
 
 void SwitchOFF(char* string)
 {
-  char pin[2]="";
-  pin[0]=string[4];pin[1]=string[5];
-Serial.println(atoi(pin));
+  char pin[2] = "";
+  pin[0] = string[4]; pin[1] = string[5];
+  int targetPIN = atoi(pin);
+  for (int i = 0; i < maxPINnum; i++) {
+    if (targetPIN == AvalablePIN[i]) {
+      digitalWrite(targetPIN, LOW);
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.write(targetPIN); Udp.write(" OFF");
+      Udp.endPacket();
+    }
+  }
   delay(100);
 
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write("OFF");
+  Udp.write(targetPIN); Udp.write("is not a usable PIN");
+  Udp.endPacket();
+}
+
+void AllON()
+{
+  for (int i = 0; i < maxPINnum; i++) {
+    digitalWrite(AvalablePIN[i], HIGH);
+    delay(100);
+  }
+  delay(100);
+
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.write("ALL ON");
+  Udp.endPacket();
+}
+
+void AllOFF()
+{
+
+  for (int i = 0; i < maxPINnum; i++) {
+    digitalWrite(AvalablePIN[i], LOW);
+    delay(100);
+  }
+  delay(100);
+
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.write("ALL OFF");
   Udp.endPacket();
 }
 

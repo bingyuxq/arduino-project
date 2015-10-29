@@ -45,6 +45,7 @@
             this.checkBoxNewlineSend = new System.Windows.Forms.CheckBox();
             this.checkBoxHexView = new System.Windows.Forms.CheckBox();
             this.checkBoxNewlineGet = new System.Windows.Forms.CheckBox();
+            this.SaveLog = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -171,11 +172,13 @@
             this.txGet.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txGet.Size = new System.Drawing.Size(533, 331);
             this.txGet.TabIndex = 0;
+            this.txGet.TextChanged += new System.EventHandler(this.txGet_TextChanged);
             // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.SaveLog);
             this.groupBox2.Controls.Add(this.buttonSend);
             this.groupBox2.Controls.Add(this.txSend);
             this.groupBox2.Location = new System.Drawing.Point(15, 402);
@@ -249,6 +252,17 @@
             this.checkBoxNewlineGet.UseVisualStyleBackColor = true;
             this.checkBoxNewlineGet.CheckedChanged += new System.EventHandler(this.checkBoxNewlineGet_CheckedChanged);
             // 
+            // SaveLog
+            // 
+            this.SaveLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SaveLog.AutoSize = true;
+            this.SaveLog.Location = new System.Drawing.Point(195, -1);
+            this.SaveLog.Name = "SaveLog";
+            this.SaveLog.Size = new System.Drawing.Size(66, 16);
+            this.SaveLog.TabIndex = 14;
+            this.SaveLog.Text = "SaveLog";
+            this.SaveLog.UseVisualStyleBackColor = true;
+            // 
             // SerialportSampleForm
             // 
             this.AcceptButton = this.buttonSend;
@@ -271,6 +285,7 @@
             this.Controls.Add(this.comboPortName);
             this.Name = "SerialportSampleForm";
             this.Text = "Serial tool Sample";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -300,6 +315,7 @@
         private System.Windows.Forms.TextBox txSend;
         private System.Windows.Forms.CheckBox checkBoxHexView;
         private System.Windows.Forms.CheckBox checkBoxNewlineGet;
+        private System.Windows.Forms.CheckBox SaveLog;
     }
 }
 

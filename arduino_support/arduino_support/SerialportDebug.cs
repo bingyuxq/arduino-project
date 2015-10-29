@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
 
@@ -19,6 +20,7 @@ namespace arduino_support
         private long send_count = 0;//发送计数
         private bool Listening = false;//是否没有执行完invoke相关操作
         private bool Closing = false;//是否正在关闭串口，执行Application.DoEvents，并阻止再次invoke
+        StreamWriter LogWriter;
 
         public SerialportSampleForm()
         {
@@ -73,6 +75,7 @@ namespace arduino_support
                     }
                     //追加的形式添加到文本框末端，并滚动到最后。
                     this.txGet.AppendText(builder.ToString());
+                    LogWriter.Write(builder.ToString());
                     //修改接收计数
                     labelGetCount.Text = "Get:" + received_count.ToString();
                 }));
@@ -92,6 +95,7 @@ namespace arduino_support
                 while (Listening) Application.DoEvents();
                 //打开时点击，则关闭串口
                 comm.Close();
+                //LogWriter.Close();
             }
             else
             {
@@ -100,9 +104,10 @@ namespace arduino_support
                 comm.BaudRate = int.Parse(comboBaudrate.Text);
                 try
                 {
+                    LogWriter = new StreamWriter("R:\\COMLog.log", true);
                     comm.Open();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     //捕获到异常信息，创建一个新的comm对象，之前的不能用了。
                     comm = new SerialPort();
@@ -165,6 +170,22 @@ namespace arduino_support
             send_count = received_count = 0;
             labelGetCount.Text = "Get:0";
             labelSendCount.Text = "Send:0";
+        }
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //强制关闭程序（强行终止Listener）
+            LogWriter.Close();
+            Environment.Exit(0);
+        }
+
+        private void txGet_TextChanged(object sender, EventArgs e)
+        {
+            if (txGet.Lines.GetUpperBound(0) > 20)
+            {
+                this.txGet.Clear();
+                send_count = 0;
+                LogWriter.Flush();
+            }
         }
     }
 }
